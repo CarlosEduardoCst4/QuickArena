@@ -38,7 +38,7 @@ O front-end é um único `index.html` com HTML, CSS e JavaScript puros. O back-e
 1. Faça um fork deste repositório ou coloque a pasta em um repositório seu no GitHub.
 2. Na Vercel, clique em **Add New > Project** e importe o repositório. Não é preciso mudar nenhuma configuração de build.
 3. Depois do primeiro deploy, abra o projeto, vá em **Storage**, crie um banco **Upstash Redis** (há plano gratuito) e conecte ao projeto. A Vercel adiciona sozinha as variáveis de ambiente do banco.
-4. Em **Settings > Environment Variables**, crie a variável `ADMIN_PIN` com o PIN do professor.
+4. (Opcional) Em **Settings > Environment Variables**, crie `ADMIN_PIN` se quiser proteger a tela do professor com senha.
 5. Em **Deployments**, faça um **Redeploy** para as variáveis passarem a valer.
 
 Também dá para subir pela linha de comando, dentro da pasta do projeto:
@@ -51,15 +51,15 @@ npx vercel
 
 | Variável | Obrigatória | Descrição |
 |---|---|---|
-| `ADMIN_PIN` | Recomendada | PIN da tela do professor. Se não for definida, o PIN padrão é `prof123`. |
+| `ADMIN_PIN` | Não | PIN opcional da tela do professor. Se não for definida, a tela abre direto em `/#admin`, sem senha. |
 | `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` | Sim | Endereço e token do banco. A integração da Vercel preenche automaticamente. |
 | `KV_REST_API_URL` e `KV_REST_API_TOKEN` | Alternativa | Nomes antigos das mesmas variáveis. O projeto aceita os dois pares. |
 
-**Troque o PIN padrão antes de usar com a turma.**
+**Sem `ADMIN_PIN`, qualquer pessoa que souber o endereço com `/#admin` acessa a tela do professor e pode limpar o ranking e o código.** Para exigir senha, crie a variável `ADMIN_PIN` na Vercel e faça um novo deploy.
 
 ## Como usar
 
-1. O professor abre o endereço do site com `/#admin` no final e entra com o PIN.
+1. O professor abre o endereço do site com `/#admin` no final. A tela abre direto, a menos que você tenha definido `ADMIN_PIN`, e nesse caso pede o PIN.
 2. Escolhe o formato da partida e clica em **Gerar código da partida**.
 3. Mostra o código na tela. Os alunos abrem o endereço normal, digitam nome e código e jogam.
 4. O professor acompanha as partidas ao vivo e o ranking, que atualizam a cada 4 segundos.
@@ -85,7 +85,7 @@ Com o mesmo código, todos os alunos recebem exatamente os mesmos vetores. A sem
 | `/api/admin` | `DELETE` | Professor | Limpa o ranking e as partidas ao vivo. |
 | `/api/config` | `POST` | Professor | Define o código ativo, ou o limpa quando enviado vazio. |
 
-As rotas do professor exigem o cabeçalho `x-admin-pin`.
+As rotas do professor exigem o cabeçalho `x-admin-pin` somente quando a variável `ADMIN_PIN` está definida.
 
 Chaves usadas no Redis: `qs:cfg` (código ativo), `qs:res` (resultados finais) e `qs:live` (partidas ao vivo).
 
@@ -102,6 +102,7 @@ Abra `http://localhost:3000`. A tela do professor fica em `http://localhost:3000
 
 ## Limitações
 
+- Por padrão a tela do professor não tem senha. Defina `ADMIN_PIN` se não quiser que os alunos a acessem.
 - A pontuação é calculada no navegador do aluno. Em sala de aula funciona bem, mas um aluno com conhecimento técnico poderia alterá-la. O painel de partidas ao vivo ajuda a acompanhar.
 - Se o mesmo nome aparecer duas vezes na mesma rodada, vale o melhor resultado.
 - O melhor e o pior caso valem para pivô último, primeiro ou do meio. Nas demais escolhas de pivô, os vetores são aleatórios.

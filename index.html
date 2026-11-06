@@ -231,6 +231,12 @@ function fim(){
 var PIN="";
 function sel(id,o,cur){return '<select id="'+id+'">'+Object.keys(o).map(function(k){return '<option value="'+k+'"'+(k==cur?" selected":"")+'>'+o[k]+'</option>'}).join("")+'</select>'}
 function gate(){
+ api("admin",{pin:""}).then(function(d){PIN="";admin(d)}).catch(function(e){
+  if(/PIN/.test(e.message))pinForm();
+  else{app.innerHTML='<h1>Área do professor</h1><div class="card"><p class="msg bad">Erro: '+esc(e.message)+'</p><div class="row"><button id="bk0">Voltar</button></div></div>';$("#bk0").onclick=function(){location.hash="";route()}}
+ });
+}
+function pinForm(){
  app.innerHTML='<h1>Área do professor</h1><div class="card"><label for="pn">PIN do professor</label><input id="pn" type="password" autocomplete="off"><p class="msg bad" id="pe"></p><div class="row"><button id="pg">Entrar</button></div></div>';
  function go(){var p=$("#pn").value;$("#pe").textContent="";api("admin",{pin:p}).then(function(d){PIN=p;admin(d)}).catch(function(e){$("#pe").textContent=/PIN/.test(e.message)?"PIN incorreto.":"Erro: "+e.message})}
  $("#pg").onclick=go;$("#pn").onkeydown=function(e){if(e.key==="Enter")go()};$("#pn").focus();

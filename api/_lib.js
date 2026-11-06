@@ -22,7 +22,9 @@ function seedOf(code) {
 }
 
 function isAdmin(req) {
-  const pin = process.env.ADMIN_PIN || "prof123";
+  // Sem ADMIN_PIN definido, a área do professor é aberta (basta usar /#admin).
+  const pin = process.env.ADMIN_PIN;
+  if (!pin) return true;
   return (req.headers["x-admin-pin"] || "") === pin;
 }
 
