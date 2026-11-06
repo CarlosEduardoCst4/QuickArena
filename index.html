@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quick Sort Arena</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap">
+<style>
+:root{color-scheme:dark;--bg:#05050a;--card:#0d1230;--card2:#151b48;--ink:#ece9ff;--mute:#a3a9d6;--line:#2b3270;--piv:#ddd6fe;--pivt:#1b1146;--lo:#4f8cff;--hi:#b36bff;--bad:#ff7a90;--ok:#7dd3fc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;background:radial-gradient(1100px 600px at 85% -10%,#1f1566 0%,transparent 60%),radial-gradient(900px 500px at -10% 5%,#0a1c55 0%,transparent 55%),var(--bg)}
+main{max-width:980px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:clamp(2rem,6vw,3.4rem);font-weight:800;letter-spacing:-.03em;margin:.2em 0 .1em;line-height:1.05;background:linear-gradient(90deg,#c4b5fd,#7c9cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:clamp(1.2rem,3vw,1.6rem);margin:0 0 .4em}
+p,label{color:var(--mute);line-height:1.55}
+p{margin:.3em 0 1em;max-width:66ch}
+label{display:block;font-weight:700;font-size:.95rem;margin:10px 0 4px}
+.card{background:linear-gradient(180deg,var(--card),#0a0e27);border:2px solid var(--line);border-radius:18px;padding:22px;margin-bottom:16px}
+button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:12px;padding:12px 20px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff}
+button.sec{background:transparent;color:var(--ink);border:2px solid var(--line)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #a78bfa;outline-offset:2px}
+input,select,textarea{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:2px solid var(--line);background:#070a1f;color:var(--ink)}
+textarea{min-height:110px;font-family:ui-monospace,Consolas,monospace;font-size:.85rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;font-weight:700}
+.tiles{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0;min-height:72px;align-items:flex-start}
+.cell{display:flex;flex-direction:column;align-items:center;gap:3px}
+.lab{font-size:.9rem;min-height:1.3em;font-weight:800}
+.lp{color:#ddd6fe}.lj{color:#7dd3fc}.li{color:#e879f9}
+.tile{min-width:58px;height:66px;padding:0 8px;display:grid;place-items:center;font-size:1.7rem;font-weight:800;border-radius:12px;border:3px solid var(--line);background:var(--card2);color:var(--ink)}
+.tile.cur{border-color:#fff;box-shadow:0 0 0 3px #3b82f6;transform:translateY(-6px)}
+.tile.p{background:var(--piv);color:var(--pivt);border-color:#fff}
+.tile.lo{background:color-mix(in srgb,var(--lo) 28%,var(--card2));border-color:var(--lo)}
+.tile.hi{background:color-mix(in srgb,var(--hi) 28%,var(--card2));border-color:var(--hi)}
+.tile.fin{background:#312e81;border-color:#818cf8}
+.tile.dim{opacity:.35}
+button.tile{cursor:pointer}
+.zones{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:start}
+.zone{min-height:90px;padding:10px;border-radius:14px;border:2px dashed var(--line)}
+.zone.lo{border-color:var(--lo)}.zone.hi{border-color:var(--hi)}
+.zone small{display:block;color:var(--mute);margin-bottom:6px}
+.zone .tiles{margin:0;min-height:0}
+.act{display:flex;gap:10px}.act button{flex:1;font-size:1.1rem;padding:16px}
+.bl{background:linear-gradient(135deg,#3b82f6,#2563eb)}.bh{background:linear-gradient(135deg,#a855f7,#7c3aed)}
+.msg{min-height:1.6em;font-weight:700}.bad{color:var(--bad)}.ok{color:var(--ok)}
+.opts{display:grid;gap:10px}.opts button{text-align:left;background:#070a1f;color:var(--ink);border:2px solid var(--line);font-size:1.05rem}
+.opts button.right{background:#1d4ed8;color:#fff;border-color:#60a5fa}
+.opts button.wrong{background:#9d174d;color:#fff;border-color:var(--bad)}
+.rk{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-radius:12px;border:2px solid var(--line);margin-bottom:8px;font-weight:700}
+.rk.m1{border-color:#fbbf24;background:color-mix(in srgb,#fbbf24 16%,transparent);font-size:1.4rem}
+.rk.m2{border-color:#cbd5e1;background:color-mix(in srgb,#cbd5e1 14%,transparent);font-size:1.25rem}
+.rk.m3{border-color:#d08a4e;background:color-mix(in srgb,#d08a4e 16%,transparent);font-size:1.15rem}
+.code{word-break:break-all;font-family:ui-monospace,Consolas,monospace;font-size:.85rem;padding:12px;border-radius:10px;background:#070a1f;border:2px dashed #4c3fb0;color:var(--ink)}
+.big{font-size:clamp(2rem,8vw,3.4rem);font-weight:800;letter-spacing:.06em;text-align:center}
+@media(max-width:560px){.zones{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+var $=function(s){return document.querySelector(s)},app=$("#app");
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function hash(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return(h>>>0).toString(36)}
+function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
+function dec(s){return JSON.parse(decodeURIComponent(escape(atob(s.trim()))))}
+function rng(seed){var a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;var t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function shuf(r,a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function copy(txt,btn){try{navigator.clipboard.writeText(txt).then(function(){btn.textContent="Copiado!"})}catch(e){btn.textContent="Copie manualmente"}}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+function api(path,opt){opt=opt||{};var hd={"Content-Type":"application/json"};if(opt.pin)hd["x-admin-pin"]=opt.pin;
+ return fetch("/api/"+path,{method:opt.method||"GET",headers:hd,body:opt.body?JSON.stringify(opt.body):undefined}).then(function(r){return r.json().catch(function(){return{}}).then(function(j){if(!r.ok)throw new Error(j.error||("erro "+r.status));return j})})}
+
+var QS=[
+["Qual é a complexidade média do Quick Sort?","O(n log n)",["O(n²)","O(n)","O(log n)"]],
+["Quando o Quick Sort chega ao pior caso, O(n²)?","Quando o pivô é sempre o menor ou o maior elemento",["Quando o vetor é aleatório","Quando o vetor tem 2 elementos","Quando o pivô é a mediana"]],
+["Depois de particionar, onde fica o pivô?","Na sua posição final correta",["No início do vetor","Sempre no meio","Em qualquer lugar da metade menor"]],
+["Qual é o paradigma do Quick Sort?","Dividir para conquistar",["Programação dinâmica","Algoritmo guloso","Força bruta"]],
+["Qual é o caso base da recursão?","Subvetor com 0 ou 1 elemento",["Subvetor com 2 elementos","Vetor ordenado","Pivô igual ao maior valor"]],
+["Como reduzir a chance do pior caso?","Pivô aleatório ou mediana de três",["Sempre o primeiro elemento","Sempre o último elemento","Ordenar antes de começar"]],
+["O que o particionamento faz?","Põe os menores que o pivô de um lado e os maiores do outro",["Ordena o vetor inteiro","Troca primeiro com último","Remove repetidos"]],
+["O Quick Sort comum é estável?","Não, a ordem de iguais pode mudar",["Sim, sempre","Só em vetores pequenos","Só com pivô aleatório"]]
+];
+
+/* ---------- código da partida: 9 dígitos, ex.: 222-333-777 ---------- */
+var CM=["rand","best","worst"],PM=["last","first","mid","med3","rand","pick"];
+function enc9(c){var i=CM.indexOf(c.c);i=i*6+PM.indexOf(c.p);i=i*8+(c.n-5);i=i*8+(c.r-1);i=i*9+c.q;var s=("000000000"+(i*10000+c.s)).slice(-9);return s.slice(0,3)+"-"+s.slice(3,6)+"-"+s.slice(6)}
+function dec9(str){var d=String(str).replace(/\D/g,"");if(d.length!==9)throw 0;var num=+d,s=num%10000,i=Math.floor(num/10000);if(i>=10368||!s)throw 0;
+ var q=i%9;i=Math.floor(i/9);var r=i%8+1;i=Math.floor(i/8);var n=i%8+5;i=Math.floor(i/8);return{c:CM[Math.floor(i/6)],p:PM[i%6],n:n,r:r,q:q,s:s}}
+function fmt(v){var d=v.replace(/\D/g,"").slice(0,9),o=d.slice(0,3);if(d.length>3)o+="-"+d.slice(3,6);if(d.length>6)o+="-"+d.slice(6);return o}
+
+/* ---------- vetores determinísticos (iguais para todos) ---------- */
+function gen(cfg,k){
+ var r=rng(cfg.s*1000+k*7+1),n=cfg.n,vals=[],P=cfg.p,C=cfg.c;
+ while(vals.length<n){var v=1+Math.floor(r()*99);if(vals.indexOf(v)<0)vals.push(v)}
+ if(C==="rand"||P==="med3"||P==="rand"||P==="pick")return shuf(r,vals);
+ var sv=vals.slice().sort(function(a,b){return a-b});
+ function build(s){
+  var m=s.length;if(m<2)return s.slice();
+  var mid=Math.floor((m-1)/2),pi=P==="last"?m-1:P==="first"?0:mid,pk=C==="best"?mid:(r()<.5?0:m-1);
+  var o=build(s.slice(0,pk)).concat(build(s.slice(pk+1))),out=[];
+  for(var i=0,j=0;i<m;i++)out.push(i===pi?s[pk]:o[j++]);
+  return out;
+ }
+ return build(sv);
+}
+function pivIdx(rule,vals,rr){
+ var m=vals.length,mid=Math.floor((m-1)/2);
+ if(rule==="last")return m-1;if(rule==="first")return 0;if(rule==="mid")return mid;if(rule==="rand")return Math.floor(rr()*m);
+ if(m<3)return m-1;
+ return [0,mid,m-1].sort(function(a,b){return vals[a]-vals[b]})[1];
+}
+var LBL={c:{rand:"Aleatório",best:"Melhor caso",worst:"Pior caso"},p:{last:"Último elemento",first:"Primeiro elemento",mid:"Elemento do meio",med3:"Mediana de três",rand:"Aleatório",pick:"O aluno escolhe"}};
+
+/* ---------- início ---------- */
+var G=null,LVT=0;
+function used(){try{return JSON.parse(ls("qs_used")||"[]")}catch(e){return[]}}
+function home(){
+ clearInterval(LVT);
+ app.innerHTML='<h1>Quick Sort Arena</h1><p>Ordene o vetor com Quick Sort, passo a passo, o mais rápido que conseguir sem errar. Os três melhores do ranking ganham prêmio.</p>'+
+ '<div class="card"><label for="nm">Seu nome</label><input id="nm" maxlength="30" autocomplete="off">'+
+ '<label for="cd">Código da partida</label><input id="cd" inputmode="numeric" maxlength="11" placeholder="000-000-000" autocomplete="off">'+
+ '<p class="msg bad" id="er"></p><div class="row"><button id="go">Começar</button></div></div>';
+ $("#cd").oninput=function(){this.value=fmt(this.value)};
+ $("#go").onclick=function(){
+  var nm=$("#nm").value.trim(),cfg,code=fmt($("#cd").value);
+  if(!nm){$("#er").textContent="Digite seu nome.";return}
+  try{cfg=dec9(code)}catch(e){$("#er").textContent="Código inválido. Ele tem 9 números, como 222-333-777.";return}
+  if(used().indexOf(code)>=0){$("#er").textContent="Você já jogou com este código. Peça um novo ao professor.";return}
+  G={cfg:cfg,code:code,name:nm,score:0,step:0,t0:Date.now()};next();
+ };
+}
+function bar(){return '<div class="top"><span>'+esc(G.name)+'</span><span>'+G.score+' pontos</span></div>'}
+function live(done){if(!G)return;api("play",{method:"POST",body:{type:"live",r:{n:G.name,s:G.score,i:Math.min(G.step,G.cfg.r+G.cfg.q),t:G.cfg.r+G.cfg.q,g:G.cfg.s,d:done?1:0}}}).catch(function(){})}
+function next(){var c=G.cfg;live(false);if(G.step<c.r)vec(G.step);else if(G.step<c.r+c.q)quiz(G.step-c.r);else fim()}
+function adv(){G.step++;next()}
+
+/* ---------- Quick Sort completo ---------- */
+function vec(k){
+ var c=G.cfg,cur=gen(c,k),n=cur.length,fin=[],stack=[[0,n-1]],rr=rng(c.s*31+k+5),t0=Date.now();
+ var lo=0,hi=0,pi=-1,pend=[],idx=0,L=[],U=[],partFin=false,allDone=false;
+ function T(v,cl){return '<div class="tile '+(cl||"")+'">'+v+'</div>'}
+ function startPart(){var vals=cur.slice(lo,hi+1);pend=vals.filter(function(v,i){return i!==pi});idx=0;L=[];U=[]}
+ function nextRange(){
+  while(stack.length){
+   var g=stack.pop();
+   if(g[0]>g[1])continue;
+   if(g[0]===g[1]){fin[g[0]]=1;continue}
+   lo=g[0];hi=g[1];pi=c.p==="pick"?-1:pivIdx(c.p,cur.slice(lo,hi+1),rr);partFin=false;
+   if(pi>=0)startPart();
+   return true;
+  }
+  return false;
+ }
+ function cell(x,lab){return '<div class="cell">'+x+'<div class="lab">'+(lab||"&nbsp;")+'</div></div>'}
+ function row(click,mark){
+  var jv=mark&&idx<pend.length?pend[idx]:null,iv=mark&&L.length?L[L.length-1]:null;
+  return '<div class="tiles">'+cur.map(function(v,i){
+   var inr=!allDone&&i>=lo&&i<=hi;
+   if(fin[i])return cell(T(v,"fin"));
+   if(inr&&click)return cell('<button class="tile" data-i="'+(i-lo)+'">'+v+'</button>');
+   if(inr){
+    if(mark&&!partFin){
+     if(i-lo===pi)return cell(T(v,"p"),'<b class="lp">pivô</b>');
+     if(v===jv)return cell(T(v,"cur"),'<b class="lj">j</b>');
+     if(v===iv)return cell(T(v,"lo"),'<b class="li">i</b>');
+     return cell(T(v,L.indexOf(v)>=0?"lo":U.indexOf(v)>=0?"hi":""));
+    }
+    return cell(T(v,!partFin&&i-lo===pi?"p":""));
+   }
+   return cell(T(v,"dim"))}).join("")+'</div>'}
+ function zones(pv,showP){return '<div class="zones"><div class="zone lo"><small>Menores que '+pv+'</small><div class="tiles">'+L.map(function(v){return T(v,"lo")}).join("")+'</div></div><div class="zone"><small>Pivô</small><div class="tiles">'+(showP?T(pv,"p"):"")+'</div></div><div class="zone hi"><small>Maiores que '+pv+'</small><div class="tiles">'+U.map(function(v){return T(v,"hi")}).join("")+'</div></div></div>'}
+ function draw(msg,cls){
+  var head=bar()+'<div class="card"><h2>Vetor '+(k+1)+' de '+c.r+'</h2>',m='<p class="msg '+(cls||"")+'" aria-live="polite">'+(msg||"")+'</p>',last=G.step+1>=c.r+c.q;
+  if(allDone){app.innerHTML=head+row(false)+m+'<button id="nx">'+(last?"Ver resultado":"Continuar")+'</button></div>';$("#nx").onclick=adv;$("#nx").focus();return}
+  if(pi<0){
+   app.innerHTML=head+'<p>Escolha o pivô do trecho em destaque. Quanto mais equilibrada a divisão, mais pontos.</p>'+row(true)+m+'</div>';
+   document.querySelectorAll("button.tile").forEach(function(b){b.onclick=function(){
+    var vals=cur.slice(lo,hi+1),i=+b.dataset.i,p=vals[i],l=vals.filter(function(v){return v<p}).length,rg=vals.length-1-l,
+    pts=Math.round(10*Math.min(l,rg)/Math.floor((vals.length-1)/2));G.score+=pts;pi=i;startPart();
+    draw("Pivô "+p+": "+l+" menores e "+rg+" maiores. +"+pts,"ok")}});return;
+  }
+  var pv=cur[lo+pi];
+  if(partFin){
+   app.innerHTML=head+row(false)+zones(pv,true)+m+'<button id="cn">Continuar</button></div>';$("#cn").onclick=function(){
+    if(nextRange())draw("");else{var sec=Math.round((Date.now()-t0)/1000),b=Math.max(0,10*n-sec);G.score+=b;allDone=true;draw("Vetor ordenado em "+sec+" s! Bônus de velocidade: +"+b,"ok")}};$("#cn").focus();return}
+  app.innerHTML=head+'<p>O <b class="lp">pivô</b> deste trecho é <b>'+pv+'</b>: o número claro com “pivô” embaixo. O <b class="lj">j</b> percorre o trecho e aponta o número que você está analisando agora. O <b class="li">i</b> marca o último número já colocado no lado dos menores'+(L.length?'':' (ainda nenhum)')+'. Compare o número em <b class="lj">j</b> com o pivô '+pv+': se for menor, vai para a esquerda; se for maior, vai para a direita.</p>'+row(false,true)+zones(pv,false)+m+
+  '<div class="act"><button class="bl" id="l">← Menor</button><button class="bh" id="h">Maior →</button></div></div>';
+  $("#l").onclick=function(){pick(true)};$("#h").onclick=function(){pick(false)};
+ }
+ function pick(isLo){
+  var pv=cur[lo+pi],v=pend[idx];
+  if((v<pv)===isLo){(isLo?L:U).push(v);idx++;G.score+=10;
+   if(idx===pend.length){
+    var seg=L.concat([pv],U);for(var i=0;i<seg.length;i++)cur[lo+i]=seg[i];
+    var p=lo+L.length;fin[p]=1;stack.push([p+1,hi]);stack.push([lo,p-1]);partFin=true;
+    draw("Pivô "+pv+" na posição final! Agora ordene o lado esquerdo e depois o direito.","ok")}
+   else draw("Certo! +10","ok");
+  }else{G.score=Math.max(0,G.score-5);draw(v+" é "+(v<pv?"menor":"maior")+" que "+pv+". −5 pontos","bad")}
+ }
+ nextRange();draw("");
+}
+
+/* ---------- pergunta ---------- */
+function quiz(i){
+ var r=rng(G.cfg.s+99),qs=shuf(r,QS),q=qs[i%qs.length],done=false,opts=shuf(Math.random,[q[1]].concat(q[2]));
+ app.innerHTML=bar()+'<div class="card"><h2>Pergunta '+(i+1)+' de '+G.cfg.q+'</h2><p style="color:var(--ink);font-size:1.25rem">'+esc(q[0])+'</p><div class="opts">'+opts.map(function(o){return '<button>'+esc(o)+'</button>'}).join("")+'</div><p class="msg" id="m" aria-live="polite"></p><div id="nz"></div></div>';
+ document.querySelectorAll(".opts button").forEach(function(b){b.onclick=function(){
+  if(done)return;done=true;var ok=b.textContent===q[1];
+  document.querySelectorAll(".opts button").forEach(function(x){if(x.textContent===q[1])x.classList.add("right")});
+  if(ok){G.score+=25;$("#m").textContent="Correto! +25 pontos";$("#m").className="msg ok"}else{b.classList.add("wrong");$("#m").textContent="Errou. A resposta certa está em verde.";$("#m").className="msg bad"}
+  $("#nz").innerHTML='<button id="nx">'+(G.step+1<G.cfg.r+G.cfg.q?"Próxima":"Ver resultado")+'</button>';$("#nx").onclick=adv;$("#nx").focus();
+ }});
+}
+
+/* ---------- fim ---------- */
+function fim(){
+ var sec=Math.round((Date.now()-G.t0)/1000),o={n:G.name,s:G.score,t:sec,g:G.cfg.s},u=used();u.push(G.code);ls("qs_used",JSON.stringify(u));
+ app.innerHTML='<h1>Fim, '+esc(G.name)+'!</h1><div class="card"><h2>'+G.score+' pontos em '+sec+' s</h2><p id="sv">Enviando seu resultado...</p><div class="row" id="bt"><button class="sec" id="hm">Voltar ao início</button></div></div>';
+ $("#hm").onclick=function(){G=null;home()};
+ function send(){$("#sv").textContent="Enviando seu resultado...";
+  api("play",{method:"POST",body:{type:"final",r:o}}).then(function(){$("#sv").textContent="Resultado enviado! Acompanhe o ranking com o professor. Para jogar de novo, você vai precisar de um novo código.";var b=$("#rt");if(b)b.remove()})
+  .catch(function(e){$("#sv").textContent="Não foi possível enviar: "+e.message+".";if(!$("#rt")){var b=document.createElement("button");b.id="rt";b.textContent="Tentar de novo";b.onclick=send;$("#bt").prepend(b)}})}
+ send();
+}
+
+/* ---------- professor ---------- */
+var PIN="";
+function sel(id,o,cur){return '<select id="'+id+'">'+Object.keys(o).map(function(k){return '<option value="'+k+'"'+(k==cur?" selected":"")+'>'+o[k]+'</option>'}).join("")+'</select>'}
+function gate(){
+ app.innerHTML='<h1>Área do professor</h1><div class="card"><label for="pn">PIN do professor</label><input id="pn" type="password" autocomplete="off"><p class="msg bad" id="pe"></p><div class="row"><button id="pg">Entrar</button></div></div>';
+ function go(){var p=$("#pn").value;$("#pe").textContent="";api("admin",{pin:p}).then(function(d){PIN=p;admin(d)}).catch(function(e){$("#pe").textContent=/PIN/.test(e.message)?"PIN incorreto.":"Erro: "+e.message})}
+ $("#pg").onclick=go;$("#pn").onkeydown=function(e){if(e.key==="Enter")go()};$("#pn").focus();
+}
+function admin(d0){
+ var c0={c:"rand",p:"last",n:7,r:1,q:2};if(d0&&d0.code)try{c0=dec9(d0.code)}catch(e){}
+ app.innerHTML='<h1>Área do professor</h1><div class="card"><h2>1. Formato e código da partida</h2><div class="grid">'+
+ '<div><label for="c">Tipo de caso</label>'+sel("c",LBL.c,c0.c)+'</div>'+
+ '<div><label for="p">Escolha do pivô</label>'+sel("p",LBL.p,c0.p)+'</div>'+
+ '<div><label for="n">Tamanho do vetor (5 a 12)</label><input id="n" type="number" min="5" max="12" value="'+c0.n+'"></div>'+
+ '<div><label for="r">Vetores a ordenar (1 a 8)</label><input id="r" type="number" min="1" max="8" value="'+c0.r+'"></div>'+
+ '<div><label for="q">Perguntas de teoria (0 a 8)</label><input id="q" type="number" min="0" max="8" value="'+c0.q+'"></div></div>'+
+ '<p style="margin-top:12px">O aluno ordena o vetor inteiro: particiona e repete em cada lado até tudo ficar no lugar. Melhor caso: o pivô divide cada trecho ao meio. Pior caso: o pivô é sempre o menor ou o maior. Esses dois casos valem para pivô último, primeiro ou do meio; nas outras escolhas, os vetores são aleatórios. Todos os alunos recebem os mesmos vetores.</p>'+
+ '<div class="row"><button id="mk">Gerar código da partida</button><button class="sec" id="cc0">Limpar código</button></div><div id="out"></div></div>'+
+ '<div class="card"><h2>2. Partidas ao vivo</h2><p id="lv"></p><div id="lvx"></div></div>'+
+ '<div class="card"><h2>3. Ranking</h2><div id="rkx"></div><div class="row"><button class="sec" id="cl">Limpar ranking</button></div><p class="msg" id="st"></p></div>'+
+ '<button class="sec" id="bk">Voltar</button>';
+ function render(d){
+  $("#out").innerHTML=d.code?'<p>Código da partida ativo. Mostre na tela para a turma digitar:</p><div class="code big">'+d.code+'</div>':'<p>Nenhum código ativo: os alunos não conseguem enviar resultados.</p>';
+  var now=Date.now(),pl=d.live.filter(function(o){return !o.d&&now-o.ts<600000}).sort(function(a,b){return b.s-a.s});
+  $("#lv").textContent=pl.length+" jogando agora, "+d.results.length+" já terminaram. Atualiza sozinho a cada 4 segundos.";
+  $("#lvx").innerHTML=pl.map(function(o){return '<div class="rk"><span>'+esc(o.n)+'</span><span>etapa '+Math.min(o.i+1,o.t)+' de '+o.t+' · '+o.s+' pts</span></div>'}).join("");
+  var r=d.results.slice().sort(function(a,b){return b.s-a.s||a.t-b.t});
+  $("#rkx").innerHTML=r.length?r.map(function(o,i){return '<div class="rk'+(i<3?" m"+(i+1):"")+'"><span>'+(i+1)+'º '+esc(o.n)+'</span><span>'+o.s+' pts · '+o.t+' s</span></div>'}).join("")+'<p>Empates na pontuação são decididos pelo menor tempo.</p>':'<p>Nenhum resultado ainda.</p>';
+ }
+ function tick(){api("admin",{pin:PIN}).then(render).catch(function(e){$("#st").textContent="Erro ao atualizar: "+e.message})}
+ $("#bk").onclick=function(){location.hash="";route()};
+ $("#mk").onclick=function(){
+  var cfg={c:$("#c").value,p:$("#p").value,n:Math.min(12,Math.max(5,+$("#n").value||7)),r:Math.min(8,Math.max(1,+$("#r").value||1)),q:Math.min(8,Math.max(0,+$("#q").value||0)),s:1+Math.floor(Math.random()*9999)};
+  api("config",{method:"POST",pin:PIN,body:{code:enc9(cfg)}}).then(tick).catch(function(e){$("#st").textContent="Erro: "+e.message});
+ };
+ $("#cc0").onclick=function(){api("config",{method:"POST",pin:PIN,body:{code:""}}).then(tick).catch(function(e){$("#st").textContent="Erro: "+e.message})};
+ var armed=0;
+ $("#cl").onclick=function(){
+  var b=$("#cl");
+  if(!armed){armed=1;b.textContent="Clique de novo para confirmar";setTimeout(function(){armed=0;b.textContent="Limpar ranking"},4000);return}
+  armed=0;b.textContent="Limpar ranking";
+  api("admin",{method:"DELETE",pin:PIN}).then(function(){$("#st").textContent="Ranking limpo.";tick()}).catch(function(e){$("#st").textContent="Erro: "+e.message});
+ };
+ render(d0||{code:"",results:[],live:[]});LVT=setInterval(tick,4000);
+}
+function route(){clearInterval(LVT);if(location.hash==="#admin")gate();else home()}
+window.addEventListener("hashchange",route);route();
+</script>
+</body>
+</html>
