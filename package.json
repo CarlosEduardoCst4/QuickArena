@@ -1,0 +1,6 @@
+{
+  "name": "quicksort-arena",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Jogo de competição sobre Quick Sort com ranking em tempo real"
+}
