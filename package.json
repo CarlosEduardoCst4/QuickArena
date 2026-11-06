@@ -1,6 +1,8 @@
 {
-  "name": "quicksort-arena",
+  "name": "quicksort-arena-local",
   "version": "1.0.0",
   "private": true,
-  "description": "Jogo de competição sobre Quick Sort com ranking em tempo real"
+  "description": "Jogo de competição sobre Quick Sort, com servidor e banco de dados locais",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
 }

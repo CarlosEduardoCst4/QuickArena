@@ -1,113 +1,91 @@
-# Quick Sort Arena
+# Quick Sort Arena (versão local)
 
-Jogo de competição para ensinar **Quick Sort** em sala de aula. Cada aluno ordena um vetor inteiro, passo a passo, e disputa um ranking em tempo real. O professor escolhe o formato da partida (melhor caso, pior caso, tipo de pivô) e acompanha tudo por uma tela própria.
+Jogo de competição para ensinar **Quick Sort** em sala de aula, rodando no seu próprio computador, com banco de dados próprio. Não precisa de internet, conta em nenhum serviço nem instalação de bibliotecas.
 
-> Feito para rodar na [Vercel](https://vercel.com) com um banco Redis gratuito (Upstash). Não usa framework nem etapa de build.
+## O que você precisa
 
-## Recursos
+- [Node.js](https://nodejs.org) 18 ou mais novo.
+- Computador do professor e alunos na **mesma rede Wi-Fi**.
 
-- **Quick Sort completo:** o aluno particiona o vetor e repete o processo em cada lado até tudo ficar na posição final.
-- **Pivô, `i` e `j` na tela:** o pivô aparece em destaque, o `j` percorre o trecho e o `i` marca o último número colocado no lado dos menores.
-- **Formato escolhido pelo professor:**
-  - tipo de caso: aleatório, melhor caso ou pior caso;
-  - pivô: último, primeiro, do meio, mediana de três, aleatório ou escolhido pelo aluno;
-  - tamanho do vetor, quantidade de vetores e perguntas de teoria.
-- **Mesmos vetores para todos:** a partida é gerada a partir do código, então a disputa é justa.
-- **Código curto de 9 números**, como `222-333-777`, para digitar rápido.
-- **Tela do professor** com partidas ao vivo, ranking com pódio dos 3 melhores e botões para limpar o ranking e o código entre rodadas.
-- **Pontuação:** +10 por acerto, −5 por erro, bônus de velocidade e +25 por pergunta de teoria correta. Empates são decididos pelo menor tempo.
+## Como iniciar
 
-## Estrutura do projeto
+**No Windows:** dê dois cliques em `iniciar.bat`.
 
-```
-quicksort-arena/
-├── index.html      tela do aluno e tela do professor (/#admin)
-├── package.json
-├── README.md
-└── api/
-    ├── _lib.js     funções compartilhadas (Redis, PIN, código)
-    ├── config.js   professor define e limpa o código da partida
-    ├── play.js     aluno envia progresso e resultado final
-    └── admin.js    professor lê o ranking e as partidas ao vivo
-```
-
-O front-end é um único `index.html` com HTML, CSS e JavaScript puros. O back-end são três funções serverless da Vercel que falam com o Redis pela API REST da Upstash, sem dependências instaladas.
-
-## Como subir na Vercel
-
-1. Faça um fork deste repositório ou coloque a pasta em um repositório seu no GitHub.
-2. Na Vercel, clique em **Add New > Project** e importe o repositório. Não é preciso mudar nenhuma configuração de build.
-3. Depois do primeiro deploy, abra o projeto, vá em **Storage**, crie um banco **Upstash Redis** (há plano gratuito) e conecte ao projeto. A Vercel adiciona sozinha as variáveis de ambiente do banco.
-4. (Opcional) Em **Settings > Environment Variables**, crie `ADMIN_PIN` se quiser proteger a tela do professor com senha.
-5. Em **Deployments**, faça um **Redeploy** para as variáveis passarem a valer.
-
-Também dá para subir pela linha de comando, dentro da pasta do projeto:
+**Em qualquer sistema**, dentro desta pasta:
 
 ```bash
-npx vercel
+node server.js
 ```
 
-### Variáveis de ambiente
+Ao iniciar, o terminal mostra os endereços:
 
-| Variável | Obrigatória | Descrição |
-|---|---|---|
-| `ADMIN_PIN` | Não | PIN opcional da tela do professor. Se não for definida, a tela abre direto em `/#admin`, sem senha. |
-| `UPSTASH_REDIS_REST_URL` e `UPSTASH_REDIS_REST_TOKEN` | Sim | Endereço e token do banco. A integração da Vercel preenche automaticamente. |
-| `KV_REST_API_URL` e `KV_REST_API_TOKEN` | Alternativa | Nomes antigos das mesmas variáveis. O projeto aceita os dois pares. |
+```
+Professor (neste computador): http://localhost:3000/#admin
+Alunos (mesma rede Wi-Fi):
+  http://192.168.0.15:3000
+```
 
-**Sem `ADMIN_PIN`, qualquer pessoa que souber o endereço com `/#admin` acessa a tela do professor e pode limpar o ranking e o código.** Para exigir senha, crie a variável `ADMIN_PIN` na Vercel e faça um novo deploy.
+- O **professor** abre o endereço com `/#admin` no final.
+- Os **alunos** abrem o endereço da rede (o IP do computador do professor) no celular ou no computador deles.
+
+Para encerrar, feche a janela do terminal ou aperte `Ctrl + C`.
 
 ## Como usar
 
-1. O professor abre o endereço do site com `/#admin` no final. A tela abre direto, a menos que você tenha definido `ADMIN_PIN`, e nesse caso pede o PIN.
-2. Escolhe o formato da partida e clica em **Gerar código da partida**.
-3. Mostra o código na tela. Os alunos abrem o endereço normal, digitam nome e código e jogam.
-4. O professor acompanha as partidas ao vivo e o ranking, que atualizam a cada 4 segundos.
-5. Para a próxima rodada, clica em **Limpar ranking** e **Limpar código** e gera um código novo.
+1. O professor abre `/#admin`, escolhe o formato da partida (melhor caso, pior caso, tipo de pivô, tamanho do vetor) e clica em **Gerar código da partida**.
+2. Mostra o código de 9 números, como `222-333-777`, na tela.
+3. Os alunos digitam nome e código e jogam. Ao terminar, o resultado entra sozinho no ranking.
+4. O professor acompanha as partidas ao vivo e o ranking, com o pódio dos 3 melhores.
+5. Para a próxima rodada: **Limpar ranking**, depois **Limpar código** e gere um código novo.
 
-Cada código só pode ser usado uma vez por aparelho. Para jogar de novo, o aluno precisa de um código novo.
+## Se os alunos não conseguirem abrir o endereço
+
+- **Firewall do Windows:** na primeira execução, o Windows pergunta se o Node.js pode receber conexões. Permita em **Redes privadas**.
+- **Wi-Fi da escola:** algumas redes bloqueiam a comunicação entre aparelhos. Nesse caso, ligue o hotspot do celular do professor e conecte o computador e os alunos nele.
+- Confira se o endereço usado é o IP mostrado no terminal, com `:3000` no final.
+
+## Banco de dados
+
+Os dados ficam no arquivo `data/db.json`, criado automaticamente na primeira partida. Ele guarda o código ativo, o ranking e as partidas ao vivo.
+
+- Para zerar tudo, feche o servidor e apague a pasta `data`.
+- Para guardar o ranking de uma aula, copie o arquivo `data/db.json` antes de limpar.
+- Ele é um arquivo de texto, não um banco SQL. Para uma turma de dezenas de alunos funciona bem.
+
+## Configurações opcionais
+
+| Variável    | Para que serve             | Padrão    |
+| ----------- | -------------------------- | --------- |
+| `PORT`      | Porta do servidor          | `3000`    |
+| `ADMIN_PIN` | Senha da tela do professor | sem senha |
+
+No Windows (Prompt de Comando), antes de iniciar:
+
+```
+set PORT=3001
+set ADMIN_PIN=minhasenha
+node server.js
+```
+
+Sem `ADMIN_PIN`, qualquer aluno que souber o endereço com `/#admin` acessa a tela do professor e pode limpar o ranking.
+
+## Estrutura
+
+```
+quicksort-arena-local/
+├── index.html     tela do aluno e tela do professor
+├── server.js      servidor e banco de dados em arquivo
+├── iniciar.bat    atalho para iniciar no Windows
+├── package.json
+└── data/          criada sozinha, guarda o banco (db.json)
+```
 
 ## Como o código de 9 números funciona
 
-O código guarda o formato da partida e uma semente:
-
-- os 5 primeiros dígitos combinam tipo de caso, pivô, tamanho do vetor, quantidade de vetores e quantidade de perguntas;
-- os 4 últimos dígitos são a semente que gera os vetores.
-
-Com o mesmo código, todos os alunos recebem exatamente os mesmos vetores. A semente também identifica a rodada: o servidor recusa resultados de códigos que não são o ativo.
-
-## API
-
-| Rota | Método | Quem usa | O que faz |
-|---|---|---|---|
-| `/api/play` | `POST` | Aluno | Envia progresso (`type: "live"`) ou resultado final (`type: "final"`). |
-| `/api/admin` | `GET` | Professor | Devolve o código ativo, as partidas ao vivo e o ranking. |
-| `/api/admin` | `DELETE` | Professor | Limpa o ranking e as partidas ao vivo. |
-| `/api/config` | `POST` | Professor | Define o código ativo, ou o limpa quando enviado vazio. |
-
-As rotas do professor exigem o cabeçalho `x-admin-pin` somente quando a variável `ADMIN_PIN` está definida.
-
-Chaves usadas no Redis: `qs:cfg` (código ativo), `qs:res` (resultados finais) e `qs:live` (partidas ao vivo).
-
-## Testar no computador
-
-```bash
-npm install -g vercel
-vercel link
-vercel env pull .env.local
-vercel dev
-```
-
-Abra `http://localhost:3000`. A tela do professor fica em `http://localhost:3000/#admin`.
+Os 5 primeiros dígitos guardam o formato da partida (caso, pivô, tamanho, vetores e perguntas) e os 4 últimos são a semente que gera os vetores. Todos os alunos recebem os mesmos vetores, e resultados de códigos que não são o ativo são recusados.
 
 ## Limitações
 
-- Por padrão a tela do professor não tem senha. Defina `ADMIN_PIN` se não quiser que os alunos a acessem.
-- A pontuação é calculada no navegador do aluno. Em sala de aula funciona bem, mas um aluno com conhecimento técnico poderia alterá-la. O painel de partidas ao vivo ajuda a acompanhar.
+- A pontuação é calculada no navegador do aluno. Um aluno com conhecimento técnico poderia alterá-la. O painel de partidas ao vivo ajuda a acompanhar.
 - Se o mesmo nome aparecer duas vezes na mesma rodada, vale o melhor resultado.
 - O melhor e o pior caso valem para pivô último, primeiro ou do meio. Nas demais escolhas de pivô, os vetores são aleatórios.
-- O `i` mostrado na tela marca o último número colocado no lado dos menores. Os números não trocam de posição a cada passo, como na partição de Lomuto.
-
-## Licença
-
-Defina aqui a licença do projeto, por exemplo MIT.
